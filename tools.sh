@@ -1,7 +1,7 @@
 #!/bin/bash
 dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
 biji=`date +"%Y-%m-%d" -d "$dateFromServer"`
-#Decrypted By YADDY D PHREAKER
+##
 clear
 red='\e[1;31m'
 green='\e[0;32m'
@@ -204,8 +204,8 @@ source /etc/os-release
 function membuatfolder() {
 mkdir -p //etc/anggun
 mkdir -p //etc/anggun/theme
-mkdir -p /var/lib/yaddykakkoii >/dev/null 2>&1
-echo "IP=" >> /var/lib/yaddykakkoii/ipvps.conf
+mkdir -p /var/lib/anggun >/dev/null 2>&1
+echo "IP=" >> /var/lib/anggun/ipvps.conf
 mkdir -p /usr/bin/xray
 mkdir -p /etc/xray
 mkdir -p /etc/udp
@@ -251,7 +251,6 @@ mkdir -p /etc/anggun/log/ssh
 mkdir -p /etc/anggun/cache
 
 mkdir -p /etc/anggun/cache/trojan-tcp
-
 mkdir -p /etc/anggun/cache/trojan-ws
 mkdir -p /etc/anggun/cache/trojan-grpc
 mkdir -p /etc/anggun/cache/shadowsocks-ws
@@ -277,37 +276,37 @@ rm -rf //etc/anggun/theme > /dev/null 2>&1
         mkdir -p //etc/anggun/theme
     fi
 #THEME RED
-cat <<EOF>> //etc/anggun/theme/red
+cat <<EOF>> etc/anggun/theme/red
 BG : \E[40;1;41m
 TEXT : \033[0;31m
 EOF
 #THEME BLUE
-cat <<EOF>> //etc/anggun/theme/blue
+cat <<EOF>> /etc/anggun/theme/blue
 BG : \E[40;1;44m
 TEXT : \033[0;34m
 EOF
 #THEME GREEN
-cat <<EOF>> //etc/anggun/theme/green
+cat <<EOF>> /etc/anggun/theme/green
 BG : \E[40;1;42m
 TEXT : \033[0;32m
 EOF
 #THEME YELLOW
-cat <<EOF>> //etc/anggun/theme/yellow
+cat <<EOF>> /etc/anggun/theme/yellow
 BG : \E[40;1;43m
 TEXT : \033[0;33m
 EOF
 #THEME MAGENTA
-cat <<EOF>> //etc/anggun/theme/magenta
+cat <<EOF>> /etc/anggun/theme/magenta
 BG : \E[40;1;43m
 TEXT : \033[0;33m
 EOF
 #THEME CYAN
-cat <<EOF>> //etc/anggun/theme/cyan
+cat <<EOF>> /etc/anggun/theme/cyan
 BG : \E[40;1;46m
 TEXT : \033[0;36m
 EOF
 #THEME CONFIG
-cat <<EOF>> //etc/anggun/theme/color.conf
+cat <<EOF>> /etc/anggun/theme/color.conf
 blue
 EOF
 }
