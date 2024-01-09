@@ -1,0 +1,346 @@
+#!/bin/bash
+dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
+biji=`date +"%Y-%m-%d" -d "$dateFromServer"`
+###########- COLOR CODE -##############
+colornow=$(cat /etc/yaddykakkoii/theme/color.conf)
+#NC="\e[0m"
+#RED="\033[0;31m" 
+COLOR1="$(cat /etc/yaddykakkoii/theme/$colornow | grep -w "TEXT" | cut -d: -f2|sed 's/ //g')"
+COLBG1="$(cat /etc/yaddykakkoii/theme/$colornow | grep -w "BG" | cut -d: -f2|sed 's/ //g')" 
+WH='\033[1;37m'                   
+###########- Yaddy Kakkoii-##########
+BIBlack='\033[1;90m'      # Black
+BIRed='\033[1;91m'        # Red
+BIGreen='\033[1;92m'      # Green
+BIYellow='\033[1;93m'     # Yellow
+BIBlue='\033[1;94m'       # Blue
+BIPurple='\033[1;95m'     # Purple
+BICyan='\033[1;96m'       # Cyan
+BIWhite='\033[1;97m'      # White
+UWhite='\033[4;37m'       # White
+On_IPurple='\033[0;105m'  #
+On_IRed='\033[0;101m'
+IBlack='\033[0;90m'       # Black
+IRed='\033[0;91m'         # Red
+IGreen='\033[0;92m'       # Green
+IYellow='\033[0;93m'      # Yellow
+IBlue='\033[0;94m'        # Blue
+IPurple='\033[0;95m'      # Purple
+ICyan='\033[0;96m'        # Cyan
+IWhite='\033[0;97m'       # White
+#NC='\e[0m'
+# // Export Color & Information
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[0;33m'
+export BLUE='\033[0;34m'
+export PURPLE='\033[0;35m'
+export CYAN='\033[0;36m'
+export LIGHT='\033[0;37m'
+export NC='\033[0m'
+# // Export Banner Status Information
+export EROR="[${RED} EROR ${NC}]"
+export INFO="[${YELLOW} INFO ${NC}]"
+export OKEY="[${GREEN} OKEY ${NC}]"
+export PENDING="[${YELLOW} PENDING ${NC}]"
+export SEND="[${YELLOW} SEND ${NC}]"
+export RECEIVE="[${YELLOW} RECEIVE ${NC}]"
+# // Export Align
+export BOLD="\e[1m"
+export WARNING="${RED}\e[5m"
+export UNDERLINE="\e[4m"
+# // Root Checking
+if [ "${EUID}" -ne 0 ]; then
+		echo -e "${EROR} Please Run This Script As Root User !"
+		exit 1
+fi
+function addssh(){
+    #deklarasi
+    clear
+    DATE_EXEC="$(date "+%d %b %Y %H:%M")"
+    domen=`cat /etc/xray/domain`
+    portsshws=`cat ~/log-install.txt | grep -w "SSH Websocket" | cut -d: -f2 | awk '{print $1}'`
+    wsssl=`cat /root/log-install.txt | grep -w "SSH SSL Websocket" | cut -d: -f2 | awk '{print $1}'`
+    #masukkan username
+    read -p "   Username : " Login
+    CEKFILE=/etc/xray/ssh.txt
+    if [ -f "$CEKFILE" ]; then
+        file001="OK"
+    else
+        touch /etc/xray/ssh.txt
+    fi
+    if grep -qw "$Login" /etc/xray/ssh.txt; then
+        echo -e "$COLOR1 ${NC}  [Error] Username \e[31m$Login\e[0m already exist"
+        read -n 1 -s -r -p "  Press any key to back on menu"
+        menu-ssh
+    else
+        echo "$Login" >> /etc/xray/ssh.txt
+    fi
+    #username gaboleh kosong
+    if [ -z $Login ]; then
+    echo -e "$COLOR1 ${NC} [Error] USERNAME GABOLEH KOSONG CUY "
+    echo ""
+    read -n 1 -s -r -p "    Press any key to back on menu"
+    menu-ssh
+    fi
+    #masukkan password
+    read -p "   Password : " Pass
+    if [ -z $Pass ]; then
+        echo -e "$COLOR1 ${NC}  [Error] PASSWORD GABOLEH KOSONG CUY "
+        echo ""
+        read -n 1 -s -r -p "   Press any key to back on menu"
+        menu-ssh
+    fi
+    #masukkan masa aktif
+    read -p "   Expired (hari): " masaaktif
+    if [ -z $masaaktif ]; then
+        echo -e "$COLOR1 ${NC}  [Error] EXP Date cannot be empty "
+    echo ""
+    read -n 1 -s -r -p "  Press any key to back on menu"
+    menu-ssh
+    fi
+    IP=$(curl -sS ifconfig.me);
+    ossl=`cat /root/log-install.txt | grep -w "OpenVPN" | cut -f2 -d: | awk '{print $6}'`
+    opensh=`cat /root/log-install.txt | grep -w "OpenSSH" | cut -f2 -d: | awk '{print $1}'`
+    db=`cat /root/log-install.txt | grep -w "Dropbear" | cut -f2 -d: | awk '{print $1,$2}'`
+    ssl="$(cat ~/log-install.txt | grep -w "Stunnel4" | cut -d: -f2)"
+    sqd="$(cat ~/log-install.txt | grep -w "Squid" | cut -d: -f2)"
+    ovpn="$(netstat -nlpt | grep -i openvpn | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
+    ovpn2="$(netstat -nlpu | grep -i openvpn | grep -i 0.0.0.0 | awk '{print $4}' | cut -d: -f2)"
+    OhpSSH=`cat /root/log-install.txt | grep -w "OHP SSH" | cut -d: -f2 | awk '{print $1}'`
+    OhpDB=`cat /root/log-install.txt | grep -w "OHP DBear" | cut -d: -f2 | awk '{print $1}'`
+    OhpOVPN=`cat /root/log-install.txt | grep -w "OHP OpenVPN" | cut -d: -f2 | awk '{print $1}'`
+    sleep 1
+    clear
+    nsdomain=$(cat /etc/xray/nsdomain)
+    pubkey=$(cat /etc/slowdns/server.pub)
+    useradd -e `date -d "$masaaktif days" +"%Y-%m-%d"` -s /bin/false -M $Login
+    exp="$(chage -l $Login | grep "Account expires" | awk -F": " '{print $2}')"
+    echo -e "$Pass\n$Pass\n"|passwd $Login &> /dev/null
+    PID=`ps -ef |grep -v grep | grep sshws |awk '{print $2}'`
+    if [[ ! -z "${PID}" ]]; then
+        echo -e ""
+        echo -e "==== 𝐀𝐜𝐜𝐨𝐮𝐧𝐭 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧 ===="
+        echo -e "Informasi Akun Premium SSH"
+        echo -e "=============================="
+        echo -e "Username: $Login"
+        echo -e "Password: $Pass"
+        echo -e "Created: ${DATE_EXEC}"
+        echo -e "Expired: $exp"
+        echo -e "==== 𝐒𝐞𝐫𝐯𝐞𝐫 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧 ==="
+        echo -e "=============Host============="
+        echo -e "IP/Host: $IP"
+        echo -e "Domain SSH: $domen"
+        echo -e "UDP Port : 1-65535"
+        echo -e "=== 𝗨𝗗𝗣 𝗔𝗰𝗰𝗼𝘂𝗻𝘁 === "
+        echo -e "$domen:1-65535@$Login:$Pass "
+        echo -e "============OpenVpn==========="
+        echo -e "OpenVPN Config : http://$IP:81/client-udp-2200.ovpn"
+        echo -e "OpenVPN Config : http://$IP:81/client-tcp-ssl.ovpn"
+        echo -e "OpenVPN Config : http://$IP:81/client-tcp-ohp1194.ovpn"
+        echo -e "OpenVPN Config : http://$IP:81/client-tcp-1194.ovpn"
+        echo -e "DNS: 8.8.8.8"
+        echo -e "=========Service-Port========="
+        echo -e "Port OpenVpn: 1194 2200 "
+        echo -e "=============================="
+        echo -e "============SlowDNS==========="
+        echo -e "DNS: 8.8.8.8"
+        echo -e "Name Server(NS): $nsdomain"
+        echo -e "DNS PUBLIC KEY: $pubkey"
+        echo -e "=========Service-Port========="
+        echo -e "Port SlowDNS: 5300 2200 53 "
+        echo -e "=============================="
+        garispanjang=$(echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+        garispendek=$(echo -e "\033[0;34m━━━━━━━━━━━━━━━━━\033[0m")
+        pilotopoxproxy=('GET /cdn-cgi/trace HTTP/1.1[crlf]hOst: skul.id[crlf][crlf]YADDYKAKKOII / [protocol][crlf]hoSt: $domen[crlf]upGraDe: GANTENG[crlf][crlf]')
+        remotopoxproxy=('Remote Proxy : opox.yaddykakkoii.my.id:80')
+        akunssh=('Akun Ssh : $domen:80@${Login}:${Pass}')
+        pilotilpedproxy=('GET / HTTP/1.1[crlf]Host: [host][crlf]Upgrade: PayloadProxyilmupediaByYaddyTampanMaksimal[crlf][crlf]')
+        remotilpedproxy=('Remote Proxy : ilped.yaddykakkoii.my.id:80')
+        pilotilpeddirek=('GET / HTTP/1.1[crlf]Host: $domen[crlf]Upgrade: PayloadDirectilmupediaByYaddyTampanMaksimal[crlf][crlf]')
+        remotilpeddirek=('kosong gaess , gausah diisi kalau mode direk')
+        echo -e "Payload WebSocket Telkomsel opox jateng
+        ${garispanjang}
+        " | tee -a /etc/log-create-user.log
+        echo -e " PILOT TELKOMSEL OPOK MODE PROXY
+        ${garispendek}
+        ${pilotopoxproxy}
+        
+        ${remotopoxproxy}
+
+        ${akunssh}
+        ${garispendek}
+        " | tee -a /etc/log-create-user.log
+        echo -e "PILOT TSEL ILMUPEDIA MODE PROXY
+        ${garispendek}
+        ${pilotilpedproxy}
+
+        ${remotilpedproxy}
+
+        ${akunssh}
+        ${garispendek}
+        " | tee -a /etc/log-create-user.log
+        echo -e "PILOT TSEL ILPED MODE DIRECT
+        ${garispendek}
+        ${pilotilpeddirek}
+
+        ${remotilpeddirek}
+
+        ${akunssh}
+        ${garispendek}
+        " | tee -a /etc/log-create-user.log
+        echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m" | tee -a /etc/log-create-user.log
+        echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
+        echo -e "\E[44;1;39m            ⇱ Script Premium By Yaddy Kakkoii ⇲             \E[0m"
+        echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
+        echo -e ""
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 ${NC} ${COLBG1}               ${WH}• SSH PANEL MENU •              ${NC} $COLOR1 $NC" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Username   ${COLOR1}: ${WH}$Login"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Password   ${COLOR1}: ${WH}$Pass"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Created On ${COLOR1}: ${WH}${DATE_EXEC}"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Expired On ${COLOR1}: ${WH}$exp"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}AKUN UDP   ${COLOR1}: ${WH}$domen:1-65535@$Login:$Pass "  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}IP         ${COLOR1}: ${WH}$IP"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Host       ${COLOR1}: ${WH}$domen"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}OpenSSH    ${COLOR1}: ${WH}$opensh" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Dropbear   ${COLOR1}: ${WH}$db"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}SSH-WS     ${COLOR1}: ${WH}$portsshws"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}SSH-SSL-WS ${COLOR1}: ${WH}$wsssl"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}SSL/TLS    ${COLOR1}:${WH}$ssl"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}UDPGW      ${COLOR1}: ${WH}7100-7300"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}UDP Port   ${COLOR1}: ${WH}1-65535"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn UDP    ${COLOR1}: ${WH}http://$domen:81/client-udp-2200.ovpn " | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn SSL    ${COLOR1}: ${WH}http://$domen:81/client-tcp-ssl.ovpn " | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn OHP    ${COLOR1}: ${WH}http://$domen:81/client-tcp-ohp1194.ovpn " | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn TCP    ${COLOR1}: ${WH}http://$domen:81/client-tcp-1194.ovpn " | tee -a /etc/log-create-user.log
+        #echo -e "OpenVPN Config : http://$IP:81/client-udp-2200.ovpn" | tee -a /etc/log-create-user.log
+        #echo -e "OpenVPN Config : http://$IP:81/client-tcp-ssl.ovpn" | tee -a /etc/log-create-user.log
+        #echo -e "OpenVPN Config : http://$IP:81/client-tcp-ohp1194.ovpn" | tee -a /etc/log-create-user.log
+        #echo -e "OpenVPN Config : http://$IP:81/client-tcp-1194.ovpn" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "  ${WH}GET http://bug.com/ HTTP/1.1[crlf]Host: $domen [crlf]User-Agent: [ua][crlf]Upgrade: websocket[crlf][crlf]Connection: Keep-Alive[crlf][crlf]${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 ${NC}                ${WH}• YADDY KAKKOII MAGELANG •${NC}                 $COLOR1 $NC"
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e " $COLOR1└───────────────────────────────────────────────┘${NC}"
+    else
+        echo -e ""
+        echo -e "==== 𝐀𝐜𝐜𝐨𝐮𝐧𝐭 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧 ===="
+        echo -e "Informasi Akun Premium SSH"
+        echo -e "=============================="
+        echo -e "Username: $Login"
+        echo -e "Password: $Pass"
+        echo -e "Created: ${DATE_EXEC}"
+        echo -e "Expired: $exp"
+        echo -e "==== 𝐒𝐞𝐫𝐯𝐞𝐫 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧 ==="
+        echo -e "=============Host============="
+        echo -e "IP/Host: $IP"
+        echo -e "Domain SSH: $domen"
+        echo -e "UDP Port : 1-65535"
+        echo -e "=== 𝗨𝗗𝗣 𝗔𝗰𝗰𝗼𝘂𝗻𝘁 === "
+        echo -e "$domen:1-65535@$Login:$Pass "
+        echo -e "============OpenVpn==========="
+        echo -e "OpenVPN Config : http://$IP:81/client-udp-2200.ovpn"
+        echo -e "OpenVPN Config : http://$IP:81/client-tcp-ssl.ovpn"
+        echo -e "OpenVPN Config : http://$IP:81/client-tcp-ohp1194.ovpn"
+        echo -e "OpenVPN Config : http://$IP:81/client-tcp-1194.ovpn"
+        echo -e "DNS: 8.8.8.8"
+        echo -e "=========Service-Port========="
+        echo -e "Port OpenVpn: 1194 2200 "
+        echo -e "=============================="
+        echo -e "============SlowDNS==========="
+        echo -e "DNS: 8.8.8.8"
+        echo -e "Name Server(NS): $nsdomain"
+        echo -e "DNS PUBLIC KEY: $pubkey"
+        echo -e "=========Service-Port========="
+        echo -e "Port SlowDNS: 5300 2200 53 "
+        echo -e "=============================="
+        garispanjang=$(echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+        garispendek=$(echo -e "\033[0;34m━━━━━━━━━━━━━━━━━\033[0m")
+        pilotopoxproxy=('GET /cdn-cgi/trace HTTP/1.1[crlf]hOst: skul.id[crlf][crlf]YADDYKAKKOII / [protocol][crlf]hoSt: $domen[crlf]upGraDe: GANTENG[crlf][crlf]')
+        remotopoxproxy=('Remote Proxy : opox.yaddykakkoii.my.id:80')
+        akunssh=('Akun Ssh : $domen:80@${Login}:${Pass}')
+        pilotilpedproxy=('GET / HTTP/1.1[crlf]Host: [host][crlf]Upgrade: PayloadProxyilmupediaByYaddyTampanMaksimal[crlf][crlf]')
+        remotilpedproxy=('Remote Proxy : ilped.yaddykakkoii.my.id:80')
+        pilotilpeddirek=('GET / HTTP/1.1[crlf]Host: $domen[crlf]Upgrade: PayloadDirectilmupediaByYaddyTampanMaksimal[crlf][crlf]')
+        remotilpeddirek=('kosong gaess , gausah diisi kalau mode direk')
+        echo -e "Payload WebSocket Telkomsel opox jateng
+        ${garispanjang}
+        " | tee -a /etc/log-create-user.log
+        echo -e " PILOT TELKOMSEL OPOK MODE PROXY
+        ${garispendek}
+        ${pilotopoxproxy}
+        
+        ${remotopoxproxy}
+
+        ${akunssh}
+        ${garispendek}
+        " | tee -a /etc/log-create-user.log
+        echo -e "PILOT TSEL ILMUPEDIA MODE PROXY
+        ${garispendek}
+        ${pilotilpedproxy}
+
+        ${remotilpedproxy}
+
+        ${akunssh}
+        ${garispendek}
+        " | tee -a /etc/log-create-user.log
+        echo -e "PILOT TSEL ILPED MODE DIRECT
+        ${garispendek}
+        ${pilotilpeddirek}
+
+        ${remotilpeddirek}
+
+        ${akunssh}
+        ${garispendek}
+        " | tee -a /etc/log-create-user.log
+        echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m" | tee -a /etc/log-create-user.log
+        echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
+        echo -e "\E[44;1;39m            ⇱ Script Premium By Yaddy Kakkoii ⇲             \E[0m"
+        echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
+        echo -e ""
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 ${NC} ${COLBG1}               ${WH}• SSH PANEL MENU •              ${NC} $COLOR1 $NC" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Username   ${COLOR1}: ${WH}$Login"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Password   ${COLOR1}: ${WH}$Pass"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Created On ${COLOR1}: ${WH}${DATE_EXEC}"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Expired On ${COLOR1}: ${WH}$exp"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}AKUN UDP   ${COLOR1}: ${WH}$domen:1-65535@$Login:$Pass "  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}IP         ${COLOR1}: ${WH}$IP"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Host       ${COLOR1}: ${WH}$domen"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}OpenSSH    ${COLOR1}: ${WH}$opensh" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Dropbear   ${COLOR1}: ${WH}$db"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}SSH-WS     ${COLOR1}: ${WH}$portsshws"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}SSH-SSL-WS ${COLOR1}: ${WH}$wsssl"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}SSL/TLS    ${COLOR1}:${WH}$ssl"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}UDPGW      ${COLOR1}: ${WH}7100-7300"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}UDP Port   ${COLOR1}: ${WH}1-65535"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn UDP    ${COLOR1}: ${WH}http://$domen:81/client-udp-2200.ovpn " | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn SSL    ${COLOR1}: ${WH}http://$domen:81/client-tcp-ssl.ovpn " | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn OHP    ${COLOR1}: ${WH}http://$domen:81/client-tcp-ohp1194.ovpn " | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 $NC  ${WH}Vpn TCP    ${COLOR1}: ${WH}http://$domen:81/client-tcp-1194.ovpn " | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "  ${WH}GET http://bug.com/DM HTTP/1.1[crlf]Host: $domen [crlf]User-Agent: [ua][crlf]Upgrade: websocket[crlf][crlf]Connection: Keep-Alive[crlf][crlf]${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"  | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}" | tee -a /etc/log-create-user.log
+        echo -e "$COLOR1 ${NC}                ${WH}• ANGGUN   •${NC}                 $COLOR1 $NC"
+        echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" | tee -a /etc/log-create-user.log
+        echo -e " $COLOR1└───────────────────────────────────────────────┘${NC}"
+    fi
+    echo -e ""
+    read -n 1 -s -r -p "  Press any key to back on menu"
+    menu-ssh
+}
+addssh

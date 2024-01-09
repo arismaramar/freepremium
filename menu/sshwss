@@ -1,0 +1,231 @@
+#!/bin/bash
+dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
+biji=`date +"%Y-%m-%d" -d "$dateFromServer"`
+###########- COLOR CODE -##############
+colornow=$(cat /etc/anggun/theme/color.conf)
+#NC="\e[0m"
+#RED="\033[0;31m" 
+COLOR1="$(cat /etc/anggun/theme/$colornow | grep -w "TEXT" | cut -d: -f2|sed 's/ //g')"
+COLBG1="$(cat /etc/anggun/theme/$colornow | grep -w "BG" | cut -d: -f2|sed 's/ //g')" 
+WH='\033[1;37m'                   
+###########- ANGGUN-##########
+BIBlack='\033[1;90m'      # Black
+BIRed='\033[1;91m'        # Red
+BIGreen='\033[1;92m'      # Green
+BIYellow='\033[1;93m'     # Yellow
+BIBlue='\033[1;94m'       # Blue
+BIPurple='\033[1;95m'     # Purple
+BICyan='\033[1;96m'       # Cyan
+BIWhite='\033[1;97m'      # White
+UWhite='\033[4;37m'       # White
+On_IPurple='\033[0;105m'  #
+On_IRed='\033[0;101m'
+IBlack='\033[0;90m'       # Black
+IRed='\033[0;91m'         # Red
+IGreen='\033[0;92m'       # Green
+IYellow='\033[0;93m'      # Yellow
+IBlue='\033[0;94m'        # Blue
+IPurple='\033[0;95m'      # Purple
+ICyan='\033[0;96m'        # Cyan
+IWhite='\033[0;97m'       # White
+#NC='\e[0m'
+# // Export Color & Information
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[0;33m'
+export BLUE='\033[0;34m'
+export PURPLE='\033[0;35m'
+export CYAN='\033[0;36m'
+export LIGHT='\033[0;37m'
+export NC='\033[0m'
+# // Export Banner Status Information
+export EROR="[${RED} EROR ${NC}]"
+export INFO="[${YELLOW} INFO ${NC}]"
+export OKEY="[${GREEN} OKEY ${NC}]"
+export PENDING="[${YELLOW} PENDING ${NC}]"
+export SEND="[${YELLOW} SEND ${NC}]"
+export RECEIVE="[${YELLOW} RECEIVE ${NC}]"
+# // Export Align
+export BOLD="\e[1m"
+export WARNING="${RED}\e[5m"
+export UNDERLINE="\e[4m"
+# // Root Checking
+if [ "${EUID}" -ne 0 ]; then
+		echo -e "${EROR} Please Run This Script As Root User !"
+		exit 1
+fi
+function sshwss(){
+    clear
+    portdb=`cat ~/log-install.txt | grep -w "Dropbear" | cut -d: -f2|sed 's/ //g' | cut -f2 -d","`
+    portsshws=`cat ~/log-install.txt | grep -w "SSH Websocket" | cut -d: -f2 | awk '{print $1}'`
+    if [ -f "/etc/systemd/system/sshws.service" ]; then
+        clear
+    else
+        wget -q -O /usr/bin/proxy3.js "https://raw.githubusercontent.com/arismaramar/freepremium/main/proxy3.js"
+        chmod +x /usr/bin/proxy3.js
+        cat <<EOF > /etc/systemd/system/sshws.service
+[Unit]
+Description=WSenabler
+Documentation=anggun 
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-wsenabler
+KillMode=process
+Restart=on-failure
+RestartSec=1s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    chmod +x /etc/systemd/system/sshws.service
+    fi
+function start() {
+    clear
+    echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC} ${COLBG1}               ${WH}• WEBSOCKET MENU •              ${NC} $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" 
+    wget -q -O /usr/bin/ssh-wsenabler "https://raw.githubusercontent.com/arismaramar/freepremium/main/ssh-wsenabler" && chmod +x /usr/bin/ssh-wsenabler
+    systemctl daemon-reload >/dev/null 2>&1
+    systemctl enable sshws.service >/dev/null 2>&1
+    systemctl start sshws.service >/dev/null 2>&1
+    sed -i "/SSH Websocket/c\   - SSH Websocket           : $portsshws [ON]" /root/log-install.txt
+    echo -e "$COLOR1 ${NC}  ${WH}[${COLOR1}INFO${WH}]${NC} ${COLOR1}•${NC} ${green}SSH Websocket Started${NC}"
+    systemctl restart sshws.service >/dev/null 2>&1
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" 
+    echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC}                ${WH}• ANGGUN •${NC}                 $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e ""
+    read -n 1 -s -r -p "  Press any key to back on menu"
+    sshwss 
+}
+function stop() {
+    clear
+    echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC} ${COLBG1}               ${WH}• WEBSOCKET MENU •              ${NC} $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}" 
+    systemctl stop sshws.service >/dev/null 2>&1
+    tmux kill-session -t sshws >/dev/null 2>&1
+    sed -i "/SSH Websocket/c\   - SSH Websocket           : $portsshws [OFF]" /root/log-install.txt
+    echo -e "$COLOR1 ${NC}  ${WH}[${COLOR1}INFO${WH}] ${COLOR1}•${NC} ${red}SSH Websocket Stopped${NC}"
+    echo -e "$COLOR1 ${NC}  ${WH}[${COLOR1}INFO${WH}] ${COLOR1}•${NC} ${WH}Restart is require for Changes"
+    echo -e "$COLOR1 ${NC}           to take effect"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" 
+    echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC}                ${WH}• ANGGUN •${NC}                 $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e ""
+    read -n 1 -s -r -p "  Press any key to back on menu"
+    sshwss
+}
+function insshws() {
+    systemctl stop sshws.service
+    tmux kill-session -t sshws
+    systemctl stop ws-dropbear.service
+    systemctl stop ws-stunnel.service
+    systemctl stop ws-ovpn.service
+    rm -f /usr/bin/ssh-wsenabler
+    rm -f /usr/local/bin/ws-dropbear
+    rm -f /usr/local/bin/ws-stunnel
+    rm -f /usr/local/bin/ws-ovpn
+    rm -f /etc/systemd/system/ws-dropbear.service
+    rm -f /etc/systemd/system/ws-stunnel.service
+    rm -f /etc/systemd/system/ws-ovpn.service
+    rm -f /usr/bin/proxy3.js
+    cd
+    wget -q -O /usr/bin/proxy3.js "https://raw.githubusercontent.com/arismaramar/freepremium/main/proxy3.js"
+    chmod +x /usr/bin/proxy3.js
+    wget -q -O /usr/local/bin/ws-dropbear "https://raw.githubusercontent.com/arismaramar/freepremium/main/ws-dropbear"
+    chmod +x /usr/local/bin/ws-dropbear
+    wget -q -O /usr/local/bin/ws-stunnel "https://raw.githubusercontent.com/arismaramar/freepremium/main/ws-stunnel"
+    chmod +x /usr/local/bin/ws-stunnel
+    wget -q -O /usr/local/bin/ws-ovpn "https://raw.githubusercontent.com/arismaramar/freepremium/main/ws-ovpn"
+    chmod +x /usr/local/bin/ws-ovpn
+    wget -q -O /etc/systemd/system/ws-dropbear.service "https://raw.githubusercontent.com/arismaramar/freepremium/main/ws-dropbear.service"
+    chmod +x /etc/systemd/system/ws-dropbear.service
+    wget -q -O /etc/systemd/system/ws-stunnel.service "https://raw.githubusercontent.com/arismaramar/freepremium/main/ws-stunnel.service"
+    chmod +x /etc/systemd/system/ws-stunnel.service
+    wget -q -O /etc/systemd/system/ws-ovpn.service "https://raw.githubusercontent.com/arismaramar/freepremium/main/ws-ovpn.service"
+    chmod +x /etc/systemd/system/ws-ovpn.service
+    sleep 1
+    systemctl daemon-reload
+    systemctl enable ws-dropbear.service
+    systemctl start ws-dropbear.service
+    systemctl restart ws-dropbear.service
+    systemctl enable ws-stunnel.service
+    systemctl start ws-stunnel.service
+    systemctl restart ws-stunnel.service
+    systemctl enable ws-ovpn.service
+    systemctl start ws-ovpn.service
+    systemctl restart ws-ovpn.service
+    rm -f /etc/systemd/system/sshws.service
+    cat <<EOF > /etc/systemd/system/sshws.service
+[Unit]
+Description=WSenabler
+Documentation=By anggun
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-wsenabler
+KillMode=process
+Restart=on-failure
+RestartSec=1s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    chmod +x /etc/systemd/system/sshws.service
+    systemctl daemon-reload >/dev/null 2>&1
+    systemctl enable sshws.service >/dev/null 2>&1
+    systemctl start sshws.service >/dev/null 2>&1
+    wget -q -O /usr/bin/ssh-wsenabler "https://raw.githubusercontent.com/arismaramar/freepremium/main/ssh-wsenabler"
+    chmod +x /usr/bin/ssh-wsenabler
+    systemctl daemon-reload >/dev/null 2>&1
+    systemctl enable sshws.service >/dev/null 2>&1
+    systemctl start sshws.service >/dev/null 2>&1
+    sed -i "/SSH Websocket/c\   - SSH Websocket           : $portsshws [ON]" /root/log-install.txt
+    systemctl restart sshws.service
+    service sshws restart
+    echo -e "$COLOR1 ${NC}  ${WH}[${COLOR1}INFO${WH}]${NC} ${COLOR1}•${NC} ${green}SSH Websocket Started${NC}"
+    yellow() { echo -e "\\033[33;1m${*}\\033[0m"; }
+    yellow "SSH WEBSOCKET TELAH AKTIF...!!"
+    echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC}                ${WH}• ANGGUN  •${NC}                 $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+}
+clear
+echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}"
+echo -e "$COLOR1 ${NC} ${COLBG1}               ${WH}• WEBSOCKET MENU •              ${NC} $COLOR1 $NC"
+echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}"
+#PID=`ps -ef |grep -v grep | grep sshws |awk '{print $2}'`
+PID=`ps -ef |grep -v grep | grep ws-stunnel |awk '{print $2}'`
+if [[ ! -z "${PID}" ]]; then
+    echo -e "$COLOR1 $NC   ${COLOR1}• ${WH}Websocket Is ${COLOR1}${WH}Running${NC}"
+else
+    echo -e "$COLOR1 $NC   ${COLOR1}• ${WH}Websocket Is ${red}${WH}Not Running${NC}"
+fi
+echo -e "$COLOR1 $NC"  
+echo -e "$COLOR1 $NC   ${WH}[${COLOR1}01${WH}]${NC} ${COLOR1}• ${WH}Enable SSH WS   ${WH}[02${WH}]${NC} ${COLOR1}• ${WH}Disable SSH WS${NC}"
+echo -e "$COLOR1 $NC"  
+echo -e "$COLOR1 $NC   ${WH}[${COLOR1}03${WH}]${NC} ${COLOR1}• ${WH}RE INSTAL SSHWS ${NC}"
+echo -e "$COLOR1 $NC   ${WH}[${COLOR1}00${WH}]${NC} ${COLOR1}• ${WH}GO BACK${NC}"
+echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}" 
+echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}"
+echo -e "$COLOR1 ${NC}                ${WH}• ANGGUN •${NC}                 $COLOR1 $NC"
+echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+echo ""
+echo -ne " ${WH}Select menu ${COLOR1}: ${WH}"; read opt
+case $opt in
+01 | 1) clear ; start ;;
+02 | 2) clear ; stop ;;
+03 | 3) clear ; insshws ;;
+00 | 0) clear ; menu ;;
+*) clear ; menu-set ;;
+esac
+}
+sshwss

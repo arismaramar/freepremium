@@ -1,0 +1,100 @@
+#!/bin/bash
+dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
+biji=`date +"%Y-%m-%d" -d "$dateFromServer"`
+###########- COLOR CODE -##############
+#& vless ### vmess #! trojanws ## ssws
+colornow=$(cat /etc/anggun/theme/color.conf)
+COLOR1="$(cat /etc/anggun/theme/$colornow | grep -w "TEXT" | cut -d: -f2|sed 's/ //g')"
+COLBG1="$(cat /etc/anggun/theme/$colornow | grep -w "BG" | cut -d: -f2|sed 's/ //g')" 
+WH='\033[1;37m'
+NC="\e[0m"
+RED="\033[0;31m"
+###########- anggun-##########
+#    cp /etc/openvpn/*.ovpn /var/www/html/
+#    sed -i "s/xxx/${domain}/g" /var/www/html/index.html
+#    sed -i "s/xxx/${domain}/g" /etc/nginx/conf.d/xray.conf
+#    sed -i "s/xxx/${domain}/g" /etc/haproxy/haproxy.cfg
+#    sed -i "s/xxx/${MYIP}/g" /etc/squid/squid.conf
+#systemctl restart ws | Ws cari di perbandingan skrip
+#systemctl enable ws
+BIBlack='\033[1;90m'      # Black
+BIRed='\033[1;91m'        # Red
+BIGreen='\033[1;92m'      # Green
+BIYellow='\033[1;93m'     # Yellow
+BIBlue='\033[1;94m'       # Blue
+BIPurple='\033[1;95m'     # Purple
+BICyan='\033[1;96m'       # Cyan
+BIWhite='\033[1;97m'      # White
+UWhite='\033[4;37m'       # White
+On_IPurple='\033[0;105m'  #
+On_IRed='\033[0;101m'
+IBlack='\033[0;90m'       # Black
+IRed='\033[0;91m'         # Red
+IGreen='\033[0;92m'       # Green
+IYellow='\033[0;93m'      # Yellow
+IBlue='\033[0;94m'        # Blue
+IPurple='\033[0;95m'      # Purple
+ICyan='\033[0;96m'        # Cyan
+IWhite='\033[0;97m'       # White
+#NC='\e[0m'
+# // Export Color & Information
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[0;33m'
+export BLUE='\033[0;34m'
+export PURPLE='\033[0;35m'
+export CYAN='\033[0;36m'
+export LIGHT='\033[0;37m'
+export NC='\033[0m'
+# // Export Banner Status Information
+export EROR="[${RED} EROR ${NC}]"
+export INFO="[${YELLOW} INFO ${NC}]"
+export OKEY="[${GREEN} OKEY ${NC}]"
+export PENDING="[${YELLOW} PENDING ${NC}]"
+export SEND="[${YELLOW} SEND ${NC}]"
+export RECEIVE="[${YELLOW} RECEIVE ${NC}]"
+# // Export Align
+export BOLD="\e[1m"
+export WARNING="${RED}\e[5m"
+export UNDERLINE="\e[4m"
+# // Root Checking
+if [ "${EUID}" -ne 0 ]; then
+		echo -e "${EROR} Please Run This Script As Root User !"
+		exit 1
+fi
+function mainmenussh(){
+    clear
+    echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC} ${COLBG1}               ${WH}• SSH PANEL MENU •              ${NC} $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e " $COLOR1┌───────────────────────────────────────────────┐${NC}
+ $COLOR1 $NC   ${WH}[${COLOR1}01${WH}]${NC} ${COLOR1}• ${WH}ADD SSH         ${WH}[${COLOR1}06${WH}]${NC} ${COLOR1}• ${WH}RENEW SSH${NC}    $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}02${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH       ${WH}[${COLOR1}07${WH}]${NC} ${COLOR1}• ${WH}USERS LIST${NC}     $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}03${WH}]${NC} ${COLOR1}• ${WH}USER ONLINE     ${WH}[${COLOR1}08${WH}]${NC} ${COLOR1}• ${WH}CEK MULTILOGIN${NC}    $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}04${WH}]${NC} ${COLOR1}• ${WH}ENABLE WS       ${WH}[${COLOR1}09${WH}]${NC} ${COLOR1}• ${WH}SSH UDP${NC}    $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}05${WH}]${NC} ${COLOR1}• ${WH}DELETE SSH      ${WH}[${COLOR1}10${WH}]${NC} ${COLOR1}• ${WH}SLOW DNS${NC}    $COLOR1 $NC
+ $COLOR1 $NC                                              ${NC} $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}00${WH}]${NC} ${COLOR1}• ${WH}GO BACK${NC}                              $COLOR1 $NC"
+    echo -e " $COLOR1└───────────────────────────────────────────────┘${NC}" 
+    echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC}                ${WH}• anggun  •${NC}                 $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e ""
+    echo -ne " ${WH}Select menu ${COLOR1}: ${WH}"; read opt
+    case $opt in
+        01 | 1) clear ; addssh ;;
+        02 | 2) clear ; trialssh ;;
+        03 | 3) clear ; cekssh ;;
+        04 | 4) clear ; sshwss ;;
+        05 | 5) clear ; delssh ;;
+        06 | 6) clear ; renewssh ;;
+        07 | 7) clear ; memberssh ;;
+        08 | 8) clear ; ceklim ;;
+        09 | 9) clear ; menuudp ;;
+        10) clear ; menuslowdns ;;
+        11) clear ; autokill ;;
+        00 | 0) clear ; menu ;;
+        *) clear ; menu-ssh ;;
+    esac
+}
+mainmenussh

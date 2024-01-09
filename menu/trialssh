@@ -1,0 +1,63 @@
+#!/bin/bash
+dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
+biji=`date +"%Y-%m-%d" -d "$dateFromServer"`
+###########- COLOR CODE -##############
+colornow=$(cat /etc/anggun/tema/color.conf)
+COLOR1="$(cat /etc/anggun/tema/$colornow | grep -w "TEXT" | cut -d: -f2|sed 's/ //g')"
+COLBG1="$(cat /etc/anggun/tema/$colornow | grep -w "BG" | cut -d: -f2|sed 's/ //g')"
+export CYAN='\033[0;36m'
+export WH='\033[1;37m'
+export NC="\e[0m"
+export RED="\033[0;31m"
+export GREEN='\033[0;32m'
+export YELLOW='\033[0;33m'
+export EROR="[${RED} EROR ${NC}]"
+export OKEY="[${GREEN} OKEY ${NC}]"
+# // Root Checking
+if [ "${EUID}" -ne 0 ]; then
+		echo -e "${EROR} Please Run This Script As Root User !"
+		exit 1
+else
+		echo -e "${OKEY} KAMU ADALAH USER ROOT 😁 !"
+		sleep 0.5
+fi
+###########- Yaddy Kakkoii-##########
+#Login=Trial-$`</dev/urandom tr -dc X-Z0-9 | head -c4`
+#Pass=`</dev/urandom tr -dc a-f0-9 | head -c10`
+#echo -e "=== 𝗨𝗗𝗣 𝗔𝗰𝗰𝗼𝘂𝗻𝘁 === "
+function menutrial(){
+    clear
+    echo -e "$COLOR1┌─────────────────────────────────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC} ${COLBG1}               ${WH}• SSH TRIAL PANEL MENU •              ${NC} $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e " $COLOR1┌───────────────────────────────────────────────┐${NC}
+ $COLOR1 $NC   ${WH}[${COLOR1}01${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH SATU HARI    ${WH}[${COLOR1}06${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH LIMA HARI${NC}    $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}02${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH SATU MINGGU  ${WH}[${COLOR1}07${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH TIGA HARI${NC}     $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}03${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH SATU BULAN   ${WH}[${COLOR1}08${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH TIGA JAM${NC}    $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}04${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH SATU TAHUN   ${WH}[${COLOR1}09${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH DUA JAM${NC}    $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}05${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH SATU JAM     ${WH}[${COLOR1}10${WH}]${NC} ${COLOR1}• ${WH}TRIAL SSH SETENGAH JAM${NC}    $COLOR1 $NC
+ $COLOR1 $NC                                              ${NC} $COLOR1 $NC
+ $COLOR1 $NC   ${WH}[${COLOR1}00${WH}]${NC} ${COLOR1}• ${WH}GO BACK${NC}                              $COLOR1 $NC"
+    echo -e " $COLOR1└───────────────────────────────────────────────┘${NC}" 
+    echo -e "$COLOR1┌────────────────────── ${WH}BY${NC} ${COLOR1}───────────────────────┐${NC}"
+    echo -e "$COLOR1 ${NC}                ${WH}• Yanggun •${NC}                 $COLOR1 $NC"
+    echo -e "$COLOR1└─────────────────────────────────────────────────┘${NC}"
+    echo -e ""
+    echo -ne " ${WH}Select menu ${COLOR1}: ${WH}"; read opt
+    case $opt in
+        01 | 1) clear ; trialsehari ;;
+        02 | 2) clear ; trialseminggu ;;
+        03 | 3) clear ; trialsebulan ;;
+        04 | 4) clear ; trialsetahun ;;
+        05 | 5) clear ; trialsejam ;;
+        06 | 6) clear ; trialmangdino ;;
+        07 | 7) clear ; trialtigahari ;;
+        08 | 8) clear ; trialtigajam ;;
+        09 | 9) clear ; trialduajam ;;
+        10) clear ; trialsetengahjam ;;
+        11) clear ; echo kosong ;;
+        00 | 0) clear ; menu ;;
+        *) clear ; menu-ssh ;;
+    esac
+}
+menutrial

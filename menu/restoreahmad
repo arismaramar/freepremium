@@ -1,0 +1,49 @@
+#!/bin/bash
+# By Ahmad
+# ==========================================
+# Color
+RED='\033[0;31m'
+NC='\033[0m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+LIGHT='\033[0;37m'
+# ==========================================
+# Getting
+#!/bin/bash
+echo ""
+echo " Masukkan URL untuk melakukan restore"
+echo ""
+echo "contoh: https://drive.google.com/u/0/uc?id=1rjAW531w4oQSFgw2PeHA8OTOuTJ3k-Hx&export=download"
+echo ""
+read -rp "Link File: " -e url
+echo $url > gdrive
+#id=$(cat gdrive | cut -d'=' -f2 | sed 's/&export//g')
+#fileid="1wv-ID19bTgPKoAUiyGTtYs-u21Wwbftc"
+fileid=$(cat gdrive | cut -d'=' -f2 | sed 's/&export//g')
+filename="backup.zip"
+html=`curl -c ./cookie -s -L "https://drive.google.com/uc?export=download&id=${fileid}"`
+curl -Lb ./cookie "https://drive.google.com/uc?export=download&`echo ${html}|grep -Po '(confirm=[a-zA-Z0-9\-_]+)'`&id=${fileid}" -o ${filename}
+unzip backup.zip
+rm -f cookie
+rm -f gdrive
+rm -f backup.zip
+sleep 1
+echo Start Restore
+cd /root/backup
+cp passwd /etc/
+cp group /etc/
+cp shadow /etc/
+cp gshadow /etc/
+cp crontab /etc/
+cp -rf xray /etc/
+cp -rf .acme.sh /root/
+cp -rf cron.d /etc/
+cp -rf ahmadstore /var/lib/
+cp -rf public_html /home/vps/
+rm -rf /root/backup
+systemctl restart xray.service >/dev/null 2>&1
+/etc/init.d/nginx restart
+echo Sudah Selesai Maszeeh
