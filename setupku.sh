@@ -389,12 +389,12 @@ wget -qO /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/arismaram
 chmod 777 /etc/nginx/conf.d/vps.conf
 wget -qO /etc/nginx/conf.d/xray.conf "https://raw.githubusercontent.com/arismaramar/freepremium/main/xray.conf"
 chmod 777 /etc/nginx/conf.d/xray.conf
-sed -i "s/yaddyganteng/${domainn}/g" /etc/nginx/conf.d/xray.conf
-sed -i "s/trojan-ws/yaddyganteng/g" /etc/nginx/conf.d/xray.conf
+sed -i "s/anggun/${domainn}/g" /etc/nginx/conf.d/xray.conf
+sed -i "s/trojan-ws/anggun/g" /etc/nginx/conf.d/xray.conf
 wget -qO /etc/xray/config.json "https://raw.githubusercontent.com/arismaramar/freepremium/main/config.json.txt"
 chmod 777 /etc/xray/config.json
 sed -i "s/anggun/${uuid}/g" /etc/xray/config.json
-sed -i "s/trojan-ws/yaddyganteng/g" /etc/xray/config.json
+sed -i "s/trojan-ws/anggun/g" /etc/xray/config.json
 }
 updateconfiglagi
 
