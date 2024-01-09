@@ -18,7 +18,7 @@ CARA LAINNYA:
 sebelum install jalankan
 
 ```
-wget https://raw.githubusercontent.com/arismaramae/freepremium/main/cekdpkg.sh && chmod +x cekdpkg.sh && ./cekdpkg.sh && rm cekdpkg.sh
+wget https://raw.githubusercontent.com/arismaramar/freepremium/main/cekdpkg.sh && chmod +x cekdpkg.sh && ./cekdpkg.sh && rm cekdpkg.sh
 ```
 
 setelah reboot,jalankan
